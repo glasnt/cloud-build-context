@@ -1,0 +1,18 @@
+steps:
+  - id: diff
+    name: gcr.io/cloud-builders/git
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        git fetch --unshallow
+        git diff origin/${_BASE_BRANCH} --name-only > /workspace/_changed_files
+        echo "_changed_files generated, $(wc -l _changed_files) lines."
+  - id: process
+    name: debian:bookworm-slim
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        echo "Changed files: "
+        for file in $(cat /workspace/_changed_files); do echo $file; done
